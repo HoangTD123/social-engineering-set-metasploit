@@ -37,31 +37,28 @@ Bước 0 — Cấu hình mạng (nếu Kali chưa có IP)
 
 Cách 1 — Xin IP từ DHCP (thử trước):
 
-đậpsudo dhclient eth0
-ip a
+<img width="249" height="81" alt="image" src="https://github.com/user-attachments/assets/9d130572-7832-4e69-a3e1-e40bb11cceb5" />
+
 
 Nếu inet 192.168.x.xxuất hiện → thành công, hãy sử dụng IP đó.
 
 Cách 2 — Nếu DHCP không được cấp, hãy đặt IP tĩnh:
 
-đậpsudo ip addr add 192.168.80.135/24 dev eth0
-sudo ip link set eth0 up
-sudo ip route add default via 192.168.80.2
+<img width="548" height="216" alt="image" src="https://github.com/user-attachments/assets/b06907f3-b9c7-43e7-8535-9afdaeb3d356" />
 
-# Kiểm tra lại
-ip a
-ping 192.168.80.1
+
+
 
 Bước 1 — Khởi động Apache & tạo web thư mục
 
-đập# Terminal bất kỳ
+<img width="448" height="222" alt="image" src="https://github.com/user-attachments/assets/951324e4-5852-45eb-a15e-58aea3113ae3" />
+
 sudo systemctl start apache2
 sudo systemctl enable apache2
 
 sudo mkdir -p /var/www/html/fb
 sudo chmod -R 777 /var/www/html/fb
 sudo fuser -k 4567/tcp
-
 Kiểm tra quá trình chạy Apache (phải được tìm thấy Active: active (running)):
 
 đậpsudo systemctl status apache2
